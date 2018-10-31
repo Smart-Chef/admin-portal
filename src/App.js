@@ -1,25 +1,76 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+import { SimpleTable, MenuAppBar } from './components';
+import Button from '@material-ui/core/Button';
+
+// import './App.css';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      queues: {},
+    };
+  }
+
+  componentDidMount = () => {
+    this.setTimer();
+  };
+
+  componentWillUnmount = () => {
+    this.clearTimer();
+  };
+
+  setTimer = () => {
+    if (this.timerHandle) {
+      // Exception?
+      return;
+    }
+    // Remember the timer handle
+    this.timerHandle = setInterval((() => {
+      this.callApiWrapper()
+      return this.callApiWrapper;
+    })(), 3000);
+  };
+
+  clearTimer = () => {
+    if (this.timerHandle) {
+        clearInterval(this.timerHandle);
+        this.timerHandle = 0;
+      }
+    };
+
+  callApiWrapper = () => {
+    this.callApi().then(queues => {
+      this.setState({
+        queues
+      })
+    })
+    .catch(err => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch('/api/show');
+    const {body} = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
   render() {
+    const { queues } = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <MenuAppBar />
+        <Button variant="contained" color="primary" onClick={this.setTimer}>
+          Start Polling
+        </Button>
+        <Button variant="contained" color="secondary" onClick={this.clearTimer}>
+          Stop Polling
+        </Button>
+        {Object.keys(queues).map(key => (
+          <SimpleTable key={key} name={key} data={queues[key]} />
+        ))}
       </div>
     );
   }
