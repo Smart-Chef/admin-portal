@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { SimpleTable, MenuAppBar } from './components';
-import Button from '@material-ui/core/Button';
+import { SimpleTable, MenuAppBar } from "./components";
+import Button from "@material-ui/core/Button";
 
 // import './App.css';
 
@@ -10,7 +10,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      queues: {},
+      queues: {}
     };
   }
 
@@ -28,31 +28,35 @@ class App extends Component {
       return;
     }
     // Remember the timer handle
-    this.timerHandle = setInterval((() => {
-      this.callApiWrapper()
-      return this.callApiWrapper;
-    })(), 3000);
+    this.timerHandle = setInterval(
+      (() => {
+        this.callApiWrapper();
+        return this.callApiWrapper;
+      })(),
+      3000
+    );
   };
 
   clearTimer = () => {
     if (this.timerHandle) {
-        clearInterval(this.timerHandle);
-        this.timerHandle = 0;
-      }
-    };
+      clearInterval(this.timerHandle);
+      this.timerHandle = 0;
+    }
+  };
 
   callApiWrapper = () => {
-    this.callApi().then(queues => {
-      this.setState({
-        queues
+    this.callApi()
+      .then(queues => {
+        this.setState({
+          queues
+        });
       })
-    })
-    .catch(err => console.log(err));
-  }
+      .catch(err => console.log(err));
+  };
 
   callApi = async () => {
-    const response = await fetch('/api/show');
-    const {body} = await response.json();
+    const response = await fetch("/api/show");
+    const { body } = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
   };
@@ -63,14 +67,14 @@ class App extends Component {
       <div className="App">
         <MenuAppBar />
         <Button variant="contained" color="primary" onClick={this.setTimer}>
-          Start Polling
-        </Button>
+          Start Polling{" "}
+        </Button>{" "}
         <Button variant="contained" color="secondary" onClick={this.clearTimer}>
-          Stop Polling
-        </Button>
+          Stop Polling{" "}
+        </Button>{" "}
         {Object.keys(queues).map(key => (
           <SimpleTable key={key} name={key} data={queues[key]} />
-        ))}
+        ))}{" "}
       </div>
     );
   }
