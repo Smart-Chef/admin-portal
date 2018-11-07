@@ -61,20 +61,32 @@ class App extends Component {
     return body;
   };
 
+  deleteById = async r => {
+    const response = await fetch(`/api/delete${r}`, { method: "POST" });
+    if (response.status !== 200) throw Error("body.message");
+    this.callApiWrapper();
+    return;
+  };
+
   render() {
     const { queues } = this.state;
     return (
       <div className="App">
         <MenuAppBar />
         <Button variant="contained" color="primary" onClick={this.setTimer}>
-          Start Polling{" "}
-        </Button>{" "}
+          Start Polling
+        </Button>
         <Button variant="contained" color="secondary" onClick={this.clearTimer}>
-          Stop Polling{" "}
-        </Button>{" "}
+          Stop Polling
+        </Button>
         {Object.keys(queues).map(key => (
-          <SimpleTable key={key} name={key} data={queues[key]} />
-        ))}{" "}
+          <SimpleTable
+            key={key}
+            name={key}
+            data={queues[key]}
+            deleteById={this.deleteById}
+          />
+        ))}
       </div>
     );
   }
