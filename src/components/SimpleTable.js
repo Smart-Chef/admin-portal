@@ -10,6 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
+import SendIcon from "@material-ui/icons/Send";
 
 const styles = theme => ({
   root: {
@@ -36,12 +37,12 @@ function SimpleTable(props) {
         <TableHead>
           <TableRow>
             <TableCell numeric>ID</TableCell>
-            <TableCell>Subscriber</TableCell>
             <TableCell>Action Key</TableCell>
             <TableCell>Action Params</TableCell>
             <TableCell>Trigger Keys</TableCell>
             <TableCell>Trigger Params</TableCell>
             <TableCell>Created At</TableCell>
+            <TableCell>Errors</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
@@ -49,18 +50,27 @@ function SimpleTable(props) {
           {Object.keys(data.items).map(key => {
             const row = data.items[key];
             if (row === null) {
-              return;
+              return null;
             }
             return (
               <TableRow key={row.id}>
                 <TableCell>{key}</TableCell>
-                <TableCell>{row.subscriber}</TableCell>
                 <TableCell>{row.action_key}</TableCell>
                 <TableCell>{row.action_params}</TableCell>
                 <TableCell>{row.trigger_keys.toString()}</TableCell>
                 <TableCell>{row.trigger_params.toString()}</TableCell>
                 <TableCell>{row.created_at}</TableCell>
+                <TableCell>{row.errors.toString()}</TableCell>
                 <TableCell>
+                  <Button
+                    variant="fab"
+                    color="primary"
+                    aria-label="Send"
+                    className={classes.button}
+                    onClick={() => props.executeById(`/${name}/${key}`)}
+                  >
+                    <SendIcon />
+                  </Button>
                   <Button
                     variant="fab"
                     color="secondary"

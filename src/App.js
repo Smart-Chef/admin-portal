@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 
-import { SimpleTable, MenuAppBar } from "./components";
-import Button from "@material-ui/core/Button";
-
-// import './App.css';
+import { MenuAppBar } from "./components";
+import { QueueTables } from "./containers";
 
 class App extends Component {
   constructor(props) {
@@ -31,7 +29,11 @@ class App extends Component {
     this.timerHandle = setInterval(
       (() => {
         this.callApiWrapper();
-        return this.callApiWrapper;
+        this.getCurrentStepWrapper();
+        return () => {
+          this.callApiWrapper();
+          // this.getCurrentStepWrapper();
+        };
       })(),
       3000
     );
@@ -54,6 +56,23 @@ class App extends Component {
       .catch(err => console.log(err));
   };
 
+  getCurrentStepWrapper = () => {
+    this.getCurrentStep()
+      .then(step => {
+        this.setState({
+          step
+        });
+      })
+      .catch(console.log);
+  };
+
+  getCurrentStep = async () => {
+    const response = await fetch("http://localhost:8001/api/currentStep");
+    const { body } = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
   callApi = async () => {
     const response = await fetch("/api/show");
     const { body } = await response.json();
@@ -65,7 +84,12 @@ class App extends Component {
     const response = await fetch(`/api/delete${r}`, { method: "POST" });
     if (response.status !== 200) throw Error("body.message");
     this.callApiWrapper();
-    return;
+  };
+
+  executeById = async r => {
+    const response = await fetch(`/api/execute${r}`, { method: "POST" });
+    if (response.status !== 200) throw Error("body.message");
+    this.callApiWrapper();
   };
 
   render() {
@@ -73,20 +97,13 @@ class App extends Component {
     return (
       <div className="App">
         <MenuAppBar />
-        <Button variant="contained" color="primary" onClick={this.setTimer}>
-          Start Polling
-        </Button>
-        <Button variant="contained" color="secondary" onClick={this.clearTimer}>
-          Stop Polling
-        </Button>
-        {Object.keys(queues).map(key => (
-          <SimpleTable
-            key={key}
-            name={key}
-            data={queues[key]}
-            deleteById={this.deleteById}
-          />
-        ))}
+        <QueueTables
+          setTimer={this.setTimer}
+          clearTimer={this.clearTimer}
+          deleteById={this.deleteById}
+          executeById={this.executeById}
+          queues={queues}
+        />
       </div>
     );
   }
